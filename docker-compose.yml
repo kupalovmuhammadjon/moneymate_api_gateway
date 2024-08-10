@@ -1,0 +1,92 @@
+version: '3.9'
+services:
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:7.4.4
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2182:2181"
+    networks:
+      - api_gateway
+    healthcheck:
+      test: ["CMD", "sh", "-c", "echo 'stat' | nc localhost 2181 | grep 'Zookeeper Version' || exit 1"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
+
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka:7.4.4
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    networks:
+      - api_gateway
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:29092"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
+
+  rabbitmq:
+    container_name: rabbit-mq
+    image: rabbitmq:3-management
+    ports:
+      - "5674:5672"
+      - "15674:15672"
+    networks:
+      - api_gateway
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  redis-db:
+    container_name: redis-db
+    image: redis
+    ports:
+      - "6380:6379"
+    restart: unless-stopped
+    networks:
+      - api_gateway
+
+  api-gateway-service:
+    container_name: api-gateway-service
+    build: .
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis-db:
+        condition: service_started
+      zookeeper:
+        condition: service_started
+      kafka:
+        condition: service_started
+    ports:
+      - "8888:8888"
+    networks:
+      - api_gateway
+
+networks:
+  api_gateway:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
