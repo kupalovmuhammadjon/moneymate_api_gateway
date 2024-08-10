@@ -7,32 +7,45 @@ import (
 	"api_gateway/pkg/logger"
 	"api_gateway/pkg/messege_brokers/kafka"
 	rabbitmq "api_gateway/pkg/messege_brokers/rabbitMQ"
+	"time"
 
-	"github.com/gin-gonic/gin"
-	swaggerFile "github.com/swaggo/files"
-	swagger "github.com/swaggo/gin-swagger"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/segmentio/encoding/json"
+	swagger "github.com/swaggo/fiber-swagger"
 )
 
-// @title LinguaLeap
+// @title MoneyMate
 // @version 1.0
 // @description Something big
 
-// @contact.url http://www.support_me_with_smile
-
 // @BasePath /
-func NewRouter(log logger.ILogger, services client.IServiceManager, rabbitMQProducer rabbitmq.IRabbitMQProducer, iKafka kafka.IKafka) *gin.Engine {
+func NewRouter(log logger.ILogger, services client.IServiceManager, rabbitMQProducer rabbitmq.IRabbitMQProducer, iKafka kafka.IKafka) *fiber.App {
 	handlerV1 := v1.NewHandlerV1(services, log, rabbitMQProducer, iKafka)
 
-	r := gin.Default()
+	router := fiber.New(fiber.Config{
+		JSONEncoder: json.Marshal,
+		JSONDecoder: json.Unmarshal,
+	})
 
-	r.GET("swagger/*any", swagger.WrapHandler(swaggerFile.Handler))
+	cors := cors.New(cors.Config{
+		AllowOrigins:  "*",
+		AllowMethods:  "GET,POST,PUT,DELETE",
+		AllowHeaders:  "Authorization",
+		ExposeHeaders: "Authorization",
+		MaxAge:        12 * int(time.Hour),
+	})
 
-	users := r.Group("/users")
+	router.Use(cors)
+
+	router.Get("/swagger/*", swagger.WrapHandler)
+
+	users := router.Group("/users")
 	{
-		users.GET("/profile", handlerV1.GetUserProfile)
-		users.PUT("/update", handlerV1.UpdateUserProfile)
-		users.PUT("/password", handlerV1.ChangePassword)
+		users.Get("/profile", handlerV1.GetUserProfile)
+		users.Put("/update", handlerV1.UpdateUserProfile)
+		users.Put("/password", handlerV1.ChangePassword)
 	}
 
-	return r
+	return router
 }

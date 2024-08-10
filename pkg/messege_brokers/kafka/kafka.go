@@ -89,7 +89,7 @@ func newKafkaProducer() (sarama.SyncProducer, error) {
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
 	
-	producer, err := sarama.NewSyncProducer([]string{"kafka:29092"}, config)
+	producer, err := sarama.NewSyncProducer([]string{"localhost:9092"}, config)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func newKafkaConsumer() (sarama.ConsumerGroup, error) {
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
 
-	consumer, err := sarama.NewConsumerGroup([]string{"kafka:29092"}, "", config)
+	consumer, err := sarama.NewConsumerGroup([]string{"localhost:9092"}, "", config)
 	if err != nil {
 		return nil, err
 	}

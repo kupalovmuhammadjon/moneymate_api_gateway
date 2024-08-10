@@ -1,7 +1,7 @@
 package models
 
 type Response struct {
-	StatisCode  int
+	StatusCode  int
 	Description string
 	Data        interface{}
 }

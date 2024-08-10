@@ -37,10 +37,10 @@ func main() {
 
 	router := api.NewRouter(logger, services, rabbitMQProducer, iKafka)
 
-	logger.Info("Gin router is running..")
-	err = router.Run(config.ApiGatewayHttpHost + config.ApiGatewayHttpPort)
+	logger.Info("Fiber router is running..")
+	err = router.Listen(config.ApiGatewayHttpHost + config.ApiGatewayHttpPort)
 	if err != nil {
-		logger.Fatal("Gin router failed to run", zap.Error(err))
+		logger.Fatal("Fiber router failed to run", zap.Error(err))
 		return
 	}
 }

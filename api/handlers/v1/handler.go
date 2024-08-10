@@ -9,7 +9,7 @@ import (
 	rabbitmq "api_gateway/pkg/messege_brokers/rabbitMQ"
 	"fmt"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -29,34 +29,36 @@ func NewHandlerV1(services client.IServiceManager, logger logger.ILogger, rabbit
 	}
 }
 
-func handleResponse(ctx *gin.Context, log logger.ILogger, msg string, statusCode int, data interface{}) {
+func handleResponse(ctx *fiber.Ctx, log logger.ILogger, msg string, statusCode int, data interface{}) error {
+	var resp models.Response
 
-	var (
-		resp = models.Response{}
-	)
-
-	switch code := statusCode; {
-	case code < 250:
+	// Determine description based on status code
+	switch {
+	case statusCode >= 200 && statusCode < 300:
 		resp.Description = "OK"
-		log.Info("~~~~> OK", logger.String("msg", msg), logger.Any("status", statusCode))
-	case code == 401:
-		resp.Description = "Unauthorized"
-		log.Info("????? Unauthorized", logger.String("msg", msg), logger.Any("status", statusCode))
-	case code == 500:
+		log.Info("Response OK", logger.String("msg", msg), logger.Int("status", statusCode))
+	case statusCode == 400:
 		resp.Description = "Bad Request"
-		log.Info("!!!!! Bad Request", logger.String("msg", msg), logger.Any("status", statusCode), logger.Any("Error", data))
-	default:
+		log.Warn("Bad Request", logger.String("msg", msg), logger.Int("status", statusCode), logger.Any("error", data))
+	case statusCode == 401:
+		resp.Description = "Unauthorized"
+		log.Warn("Unauthorized", logger.String("msg", msg), logger.Int("status", statusCode))
+	case statusCode >= 500:
 		resp.Description = "Internal Server Error"
-		log.Info("!!!!! Internal Server Error", logger.String("msg", msg), logger.Any("status", statusCode), logger.Any("Error", data))
+		log.Error("Internal Server Error", logger.String("msg", msg), logger.Int("status", statusCode), logger.Any("error", data))
+	default:
+		resp.Description = "Unknown Error"
+		log.Error("Unknown Error", logger.String("msg", msg), logger.Int("status", statusCode), logger.Any("error", data))
 	}
 
-	resp.StatisCode = statusCode
+	resp.StatusCode = statusCode
 	resp.Data = data
 
-	ctx.JSON(statusCode, resp)
+	return ctx.Status(statusCode).JSON(resp)
 }
 
-func getUserInfoFromToken(ctx *gin.Context) (*models.UserInfoFromToken, error) {
+
+func getUserInfoFromToken(ctx *fiber.Ctx) (*models.UserInfoFromToken, error) {
 
 	var (
 		token  string
@@ -65,7 +67,7 @@ func getUserInfoFromToken(ctx *gin.Context) (*models.UserInfoFromToken, error) {
 		err    error
 	)
 
-	token = ctx.GetHeader("Authorization")
+	ctx.GetReqHeaders()
 	if token == "" {
 		return nil, fmt.Errorf("authorization is requeired")
 	}
