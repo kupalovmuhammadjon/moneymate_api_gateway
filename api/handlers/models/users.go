@@ -10,7 +10,9 @@ type UserInfoFromToken struct {
 	Id        string `json:"id"`
 	Username  string `json:"username"`
 	Email     string `json:"email"`
-	FullName  string `json:"full_name"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Role      string `json:"role"`
 	CreatedAt string `json:"created_at"`
 }
 
@@ -18,22 +20,25 @@ type User struct {
 	Id             string `json:"id"`
 	Username       string `json:"username"`
 	Email          string `json:"email"`
-	FullName       string `json:"full_name"`
+	FirstName      string `json:"first_name"`
+	LastName       string `json:"last_name"`
 	NativeLanguage string `json:"native_language"`
 	CreatedAt      string `json:"created_at"`
 }
 
 type UpdateUser struct {
-	FullName       string `json:"full_name"`
-	NativeLanguage string `json:"native_language"`
+	Username       string `json:"username"`
+	Email          string `json:"email"`
+	FirstName      string `json:"first_name"`
+	LastName       string `json:"last_name"`
 }
 
 type UpdateProfileResponce struct {
 	Id             string `json:"id"`
 	Username       string `json:"username"`
 	Email          string `json:"email"`
-	FullName       string `json:"full_name"`
-	NativeLanguage string `json:"native_language"`
+	FirstName      string `json:"first_name"`
+	LastName       string `json:"last_name"`
 	UpdatedAt      string `json:"updated_at"`
 }
 

@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/users/password": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "changing user password",
                 "consumes": [
                     "application/json"
@@ -69,6 +74,11 @@ const docTemplate = `{
         },
         "/users/profile": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "getting user profile by user id",
                 "consumes": [
                     "application/json"
@@ -110,6 +120,11 @@ const docTemplate = `{
         },
         "/users/update": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "updating user profile",
                 "consumes": [
                     "application/json"
@@ -180,7 +195,7 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "statisCode": {
+                "statusCode": {
                     "type": "integer"
                 }
             }
@@ -188,13 +203,26 @@ const docTemplate = `{
         "models.UpdateUser": {
             "type": "object",
             "properties": {
-                "full_name": {
+                "email": {
                     "type": "string"
                 },
-                "native_language": {
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

@@ -1,0 +1,11 @@
+p, admin, /*, *
+
+
+p, admin, /users/profile, GET
+p, admin, /users/update, PUT
+p, admin, /users/password, PUT
+
+
+p, user, /users/profile, GET
+p, user, /users/update, PUT
+p, user, /users/password, PUT

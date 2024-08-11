@@ -67,22 +67,22 @@ func getUserInfoFromToken(ctx *fiber.Ctx) (*models.UserInfoFromToken, error) {
 		err    error
 	)
 
-	ctx.GetReqHeaders()
+	token = ctx.Get("Authorization")
 	if token == "" {
 		return nil, fmt.Errorf("authorization is requeired")
 	}
-	fmt.Println(token)
 
 	claims, err = tokens.ExtractClaims(token)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(claims)
 
 	resp.Id = claims["user_id"].(string)
 	resp.Username = claims["username"].(string)
 	resp.Email = claims["email"].(string)
-	resp.FullName = claims["full_name"].(string)
+	resp.FirstName = claims["first_name"].(string)
+	resp.LastName = claims["last_name"].(string)
+	resp.Role = claims["role"].(string)
 
 	return &resp, nil
 }

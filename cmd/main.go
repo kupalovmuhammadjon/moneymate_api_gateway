@@ -8,6 +8,8 @@ import (
 	"api_gateway/pkg/messege_brokers/kafka"
 	rabbitmq "api_gateway/pkg/messege_brokers/rabbitMQ"
 
+	"github.com/casbin/casbin/v2"
+
 	"go.uber.org/zap"
 )
 
@@ -19,6 +21,12 @@ func main() {
 	services, err := client.NewGrpcClients(config)
 	if err != nil {
 		logger.Fatal("Failed make client connections ", zap.Error(err))
+		return
+	}
+
+	casbinEnforcer, err := casbin.NewEnforcer("./configs/model.conf", "./configs/policy.csv")
+	if err != nil {
+		logger.Error("Error while loading model and policy", zap.Error(err))
 		return
 	}
 
@@ -35,7 +43,7 @@ func main() {
 	}
 	defer iKafka.Close()
 
-	router := api.NewRouter(logger, services, rabbitMQProducer, iKafka)
+	router := api.NewRouter(logger, services, rabbitMQProducer, iKafka, casbinEnforcer)
 
 	logger.Info("Fiber router is running..")
 	err = router.Listen(config.ApiGatewayHttpHost + config.ApiGatewayHttpPort)

@@ -12,14 +12,18 @@ definitions:
       data: {}
       description:
         type: string
-      statisCode:
+      statusCode:
         type: integer
     type: object
   models.UpdateUser:
     properties:
-      full_name:
+      email:
         type: string
-      native_language:
+      first_name:
+        type: string
+      last_name:
+        type: string
+      username:
         type: string
     type: object
 info:
@@ -59,6 +63,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Change User Password
       tags:
       - users
@@ -86,6 +92,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get User Profile
       tags:
       - users
@@ -120,7 +128,14 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Update User Profile
       tags:
       - users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
