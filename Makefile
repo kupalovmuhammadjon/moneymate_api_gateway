@@ -35,7 +35,7 @@ update-proto-module:
 	git submodule update --remote --merge
 
 swag-gen:
-	swag init -g ./api/router.go -o api/docs
+	swag init  -g ./api/router.go -o api/docs 
 
 proto-gen:
 	@./scripts/gen-proto.sh $(CURRENT_DIR)

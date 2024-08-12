@@ -12,7 +12,7 @@ func ConnectDB(cfg *configs.Config) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     cfg.RedisHost + ":" + cfg.RedisPort,
 		Password: cfg.RedisPassword,
-		DB:       0,
+		DB:       cfg.RedisDBNumber,
 	})
 
 	err := client.Ping(context.Background()).Err()

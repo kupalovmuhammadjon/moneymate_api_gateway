@@ -1,5 +1,208 @@
 basePath: /
 definitions:
+  budgeting_service.Account:
+    properties:
+      balance:
+        type: number
+      created_at:
+        type: string
+      currency:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  budgeting_service.Accounts:
+    properties:
+      accounts:
+        items:
+          $ref: '#/definitions/budgeting_service.Account'
+        type: array
+    type: object
+  budgeting_service.Budget:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      created_at:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      period:
+        type: string
+      start_date:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  budgeting_service.Budgets:
+    properties:
+      budgets:
+        items:
+          $ref: '#/definitions/budgeting_service.Budget'
+        type: array
+    type: object
+  budgeting_service.Categories:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/budgeting_service.Category'
+        type: array
+    type: object
+  budgeting_service.Category:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  budgeting_service.CreateAccount:
+    properties:
+      balance:
+        type: number
+      currency:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  budgeting_service.CreateBudget:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      end_date:
+        type: string
+      period:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  budgeting_service.CreateCategory:
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  budgeting_service.CreateGoal:
+    properties:
+      current_amount:
+        type: number
+      deadline:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      target_amount:
+        type: number
+      user_id:
+        type: string
+    type: object
+  budgeting_service.CreateTransaction:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      category_id:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  budgeting_service.Goal:
+    properties:
+      created_at:
+        type: string
+      current_amount:
+        type: number
+      deadline:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      target_amount:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  budgeting_service.Goals:
+    properties:
+      goals:
+        items:
+          $ref: '#/definitions/budgeting_service.Goal'
+        type: array
+    type: object
+  budgeting_service.Transaction:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      category_id:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  budgeting_service.Transactions:
+    properties:
+      transactions:
+        items:
+          $ref: '#/definitions/budgeting_service.Transaction'
+        type: array
+    type: object
   models.ChangePassword:
     properties:
       current_password:
@@ -32,6 +235,992 @@ info:
   title: MoneyMate
   version: "1.0"
 paths:
+  /accounts/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves an account by ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Account'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - accounts
+  /accounts/{id}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an account by ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account deleted successfully
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - accounts
+  /accounts/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing account
+      parameters:
+      - description: Account id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Account Update Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.Account'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account updated successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Account'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - accounts
+  /accounts/all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all accounts
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Limit number
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Type
+        in: query
+        name: type
+        type: string
+      - description: Balance from
+        in: query
+        name: balance_from
+        type: number
+      - description: Balance to
+        in: query
+        name: balance_to
+        type: number
+      - description: Currency
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Accounts retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Accounts'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - accounts
+  /accounts/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates an account
+      parameters:
+      - description: Account Creation Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.CreateAccount'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Account created successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Account'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - accounts
+  /budgets/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a budget by ID
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Budget'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - budgets
+  /budgets/{id}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a budget by ID
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget deleted successfully
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - budgets
+  /budgets/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing budget
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Budget Update Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.Budget'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget updated successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Budget'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - budgets
+  /budgets/all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all budgets
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Limit number
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: category_id
+        in: query
+        name: category_id
+        type: string
+      - description: Name
+        in: query
+        name: period
+        type: string
+      - description: Type
+        in: query
+        name: type
+        type: string
+      - description: Amount
+        in: query
+        name: amount
+        type: number
+      - description: start_date
+        in: query
+        name: start_date
+        type: string
+      - description: end_date
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budgets retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Budgets'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - budgets
+  /budgets/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new budget
+      parameters:
+      - description: Budget Creation Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.CreateBudget'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Budget created successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Budget'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - budgets
+  /categories/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Category'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - categories
+  /categories/{id}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category deleted successfully
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - categories
+  /categories/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Category Update Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category updated successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Category'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - categories
+  /categories/all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all categories
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Limit number
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Type
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Categories retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Categories'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - categories
+  /categories/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new category
+      parameters:
+      - description: Category Creation Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.CreateCategory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Category created successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Category'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - categories
+  /goals/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a goal by ID
+      parameters:
+      - description: Goal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Goal retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Goal'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - goals
+  /goals/{id}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a goal by ID
+      parameters:
+      - description: Goal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Goal deleted successfully
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - goals
+  /goals/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing goal
+      parameters:
+      - description: Goal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Goal Update Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.Goal'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Goal updated successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Goal'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - goals
+  /goals/all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all goals
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Limit number
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Target Amount
+        in: query
+        name: target_amount
+        type: number
+      - description: Current Amount
+        in: query
+        name: current_amount
+        type: number
+      - description: Deadline
+        in: query
+        name: deadline
+        type: string
+      - description: Status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Goals retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Goals'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - goals
+  /goals/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new goal
+      parameters:
+      - description: Goal Creation Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.CreateGoal'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Goal created successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Goal'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - goals
+  /transactions/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a transaction by ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Transaction'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - transactions
+  /transactions/{id}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a transaction by ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction deleted successfully
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - transactions
+  /transactions/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing transaction
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Transaction Update Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction updated successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Transaction'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - transactions
+  /transactions/all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all transactions
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Limit number
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Amount
+        in: query
+        name: amount
+        type: number
+      - description: Type
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transactions retrieved successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Transactions'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - transactions
+  /transactions/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new transaction
+      parameters:
+      - description: Transaction Creation Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/budgeting_service.CreateTransaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Transaction created successfully
+          schema:
+            $ref: '#/definitions/budgeting_service.Transaction'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - transactions
   /users/password:
     put:
       consumes:

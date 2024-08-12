@@ -9,7 +9,7 @@ import (
 )
 
 // GetUserProfile  	godoc
-// @Security ApiKeyAuth
+// @Security        ApiKeyAuth
 // @Router 			/users/profile [get]
 // @Summary 		Get User Profile
 // @Description 	getting user profile by user id

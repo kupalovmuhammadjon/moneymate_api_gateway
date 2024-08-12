@@ -6,7 +6,6 @@ import (
 	"api_gateway/grpc/client"
 	"api_gateway/pkg/logger"
 	"api_gateway/pkg/messege_brokers/kafka"
-	rabbitmq "api_gateway/pkg/messege_brokers/rabbitMQ"
 
 	"github.com/casbin/casbin/v2"
 
@@ -30,12 +29,6 @@ func main() {
 		return
 	}
 
-	rabbitMQProducer, err := rabbitmq.NewRabbitMQProducer()
-	if err != nil {
-		logger.Fatal("Failed to create rabbitMQ producer", zap.Error(err))
-		return
-	}
-
 	iKafka, err := kafka.NewIKafka()
 	if err != nil {
 		logger.Fatal("Failed to create Kafka producer and consumer", zap.Error(err))
@@ -43,7 +36,7 @@ func main() {
 	}
 	defer iKafka.Close()
 
-	router := api.NewRouter(logger, services, rabbitMQProducer, iKafka, casbinEnforcer)
+	router := api.NewRouter(logger, services, iKafka, casbinEnforcer)
 
 	logger.Info("Fiber router is running..")
 	err = router.Listen(config.ApiGatewayHttpHost + config.ApiGatewayHttpPort)

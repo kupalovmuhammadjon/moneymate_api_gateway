@@ -61,7 +61,7 @@ func JWTMiddleware(enforcer *casbin.Enforcer) func(ctx *fiber.Ctx) error {
 
 func (c *casbinPermission) checkPermission(ctx *fiber.Ctx, role string) (bool, error) {
 	subject := role
-	object := ctx.OriginalURL()
+	object := ctx.Path()
 	action := ctx.Method()
 
 	allow, err := c.enforcer.Enforce(subject, object, action)
