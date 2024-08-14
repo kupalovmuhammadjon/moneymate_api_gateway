@@ -2,6 +2,7 @@ package v1
 
 import (
 	pb "api_gateway/genproto/budgeting_service"
+	"encoding/json"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -120,7 +121,6 @@ func (h *HandlerV1) GetAllGoals(ctx *fiber.Ctx) error {
 // @Failure         404 {object} models.Response "Not Found"
 // @Failure         500 {object} models.Response "Internal Server Error"
 func (h *HandlerV1) UpdateGoal(ctx *fiber.Ctx) error {
-	reqCtx := ctx.Context()
 
 	id := ctx.Params("id")
 	if len(id) < 5 {
@@ -133,13 +133,22 @@ func (h *HandlerV1) UpdateGoal(ctx *fiber.Ctx) error {
 		return handleResponse(ctx, h.log, "Error while parsing body", http.StatusBadRequest, err.Error())
 	}
 	req.Id = id
-
-	res, err := h.services.GoalService().Update(reqCtx, &req)
+	data, err := json.Marshal(&req)
 	if err != nil {
-		return handleResponse(ctx, h.log, "Error while updating goal", http.StatusInternalServerError, err.Error())
+		return handleResponse(ctx, h.log, "Error while marshalling request", 404, err.Error())
 	}
 
-	return handleResponse(ctx, h.log, "Goal successfully updated", http.StatusOK, res)
+	err = h.iKafka.ProduceMessage("goal_progress_updated", string(data))
+	if err != nil {
+		return handleResponse(ctx, h.log, "Error while sending message", http.StatusInternalServerError, err.Error())
+	}
+
+	// res, err := h.services.GoalService().Update(reqCtx, &req)
+	// if err != nil {
+	// 	return handleResponse(ctx, h.log, "Error while updating goal", http.StatusInternalServerError, err.Error())
+	// }
+
+	return handleResponse(ctx, h.log, "Goal successfully updated", http.StatusOK, nil)
 }
 
 // DeleteGoal godoc

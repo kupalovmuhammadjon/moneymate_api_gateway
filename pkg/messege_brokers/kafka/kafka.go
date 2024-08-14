@@ -2,13 +2,15 @@ package kafka
 
 import (
 	"context"
+	"log"
+	"os"
 
 	"github.com/IBM/sarama"
 )
 
 type IKafka interface {
 	Close()
-	ProduceMessage(string, string, int32) error
+	ProduceMessage(string, string) error
 	ConsumeMessages(string) error
 }
 
@@ -56,11 +58,10 @@ func NewIKafka() (IKafka, error) {
 	}, nil
 }
 
-func (k *kafka) ProduceMessage(topic, value string, partion int32) error {
+func (k *kafka) ProduceMessage(topic, value string) error {
 	message := &sarama.ProducerMessage{
-		Topic:     topic,
-		Value:     sarama.StringEncoder(value),
-		Partition: partion,
+		Topic: topic,
+		Value: sarama.StringEncoder(value),
 	}
 	_, _, err := k.producer.SendMessage(message)
 	if err != nil {
@@ -87,9 +88,11 @@ func (k *kafka) Close() {
 
 func newKafkaProducer() (sarama.SyncProducer, error) {
 	config := sarama.NewConfig()
+	config.Consumer.Return.Errors = true
 	config.Producer.Return.Successes = true
-	
-	producer, err := sarama.NewSyncProducer([]string{"localhost:9092"}, config)
+	sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
+
+	producer, err := sarama.NewSyncProducer([]string{"kafka1:29092"}, config)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +102,10 @@ func newKafkaProducer() (sarama.SyncProducer, error) {
 func newKafkaConsumer() (sarama.ConsumerGroup, error) {
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
+	config.Producer.Return.Successes = true
+	sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
 
-	consumer, err := sarama.NewConsumerGroup([]string{"localhost:9092"}, "", config)
+	consumer, err := sarama.NewConsumerGroup([]string{"kafka1:29092"}, "", config)
 	if err != nil {
 		return nil, err
 	}

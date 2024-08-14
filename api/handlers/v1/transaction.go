@@ -19,20 +19,26 @@ import (
 // @Failure         401 {object} models.Response "Unauthorized"
 // @Failure         500 {object} models.Response "Internal Server Error"
 func (h *HandlerV1) CreateTransaction(ctx *fiber.Ctx) error {
-	reqCtx := ctx.Context()
+	// reqCtx := ctx.Context()
 
-	req := pb.CreateTransaction{}
-	err := ctx.BodyParser(&req)
+	// req := pb.CreateTransaction{}
+	// err := ctx.BodyParser(&req)
+	// if err != nil {
+	// 	return handleResponse(ctx, h.log, "Error while parsing body", http.StatusBadRequest, err.Error())
+	// }
+
+
+	err := h.iKafka.ProduceMessage("transaction_created", string(ctx.Body()))
 	if err != nil {
-		return handleResponse(ctx, h.log, "Error while parsing body", http.StatusBadRequest, err.Error())
+		return handleResponse(ctx, h.log, "Error while sending message", http.StatusInternalServerError, err.Error())
 	}
 
-	res, err := h.services.TransactionService().Create(reqCtx, &req)
-	if err != nil {
-		return handleResponse(ctx, h.log, "Error while creating transaction", http.StatusInternalServerError, err.Error())
-	}
+	// res, err := h.services.TransactionService().Create(reqCtx, &req)
+	// if err != nil {
+	// 	return handleResponse(ctx, h.log, "Error while creating transaction", http.StatusInternalServerError, err.Error())
+	// }
 
-	return handleResponse(ctx, h.log, "Transaction successfully created", http.StatusCreated, res)
+	return handleResponse(ctx, h.log, "Transaction successfully created", http.StatusCreated, nil)
 }
 
 // GetTransactionById godoc

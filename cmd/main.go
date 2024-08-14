@@ -23,7 +23,7 @@ func main() {
 		return
 	}
 
-	casbinEnforcer, err := casbin.NewEnforcer("./configs/model.conf", "./configs/policy.csv")
+	casbinEnforcer, err := casbin.NewEnforcer("/app/configs/model.conf", "/app/configs/policy.csv")
 	if err != nil {
 		logger.Error("Error while loading model and policy", zap.Error(err))
 		return

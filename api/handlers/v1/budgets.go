@@ -2,6 +2,7 @@ package v1
 
 import (
 	pb "api_gateway/genproto/budgeting_service"
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -132,7 +133,6 @@ func (h *HandlerV1) GetAllBudgets(ctx *fiber.Ctx) error {
 // @Failure         404 {object} models.Response "Not Found"
 // @Failure         500 {object} models.Response "Internal Server Error"
 func (h *HandlerV1) UpdateBudget(ctx *fiber.Ctx) error {
-	reqCtx := ctx.Context()
 
 	id := ctx.Params("id")
 	if len(id) < 5 {
@@ -145,13 +145,22 @@ func (h *HandlerV1) UpdateBudget(ctx *fiber.Ctx) error {
 		return handleResponse(ctx, h.log, "Error while parsing body", 404, err.Error())
 	}
 	req.Id = id
-
-	res, err := h.services.BudgetService().Update(reqCtx, &req)
+	data, err := json.Marshal(&req)
 	if err != nil {
-		return handleResponse(ctx, h.log, "Error while updating budget", http.StatusInternalServerError, err.Error())
+		return handleResponse(ctx, h.log, "Error while marshalling request", 404, err.Error())
 	}
 
-	return handleResponse(ctx, h.log, "Budget successfully updated", 200, res)
+	err = h.iKafka.ProduceMessage("budget_updated", string(data))
+	if err != nil {
+		return handleResponse(ctx, h.log, "Error while sending message", http.StatusInternalServerError, err.Error())
+	}
+
+	// res, err := h.services.BudgetService().Update(reqCtx, &req)
+	// if err != nil {
+	// 	return handleResponse(ctx, h.log, "Error while updating budget", http.StatusInternalServerError, err.Error())
+	// }
+
+	return handleResponse(ctx, h.log, "Budget successfully updated", 200, nil)
 }
 
 // DeleteBudget godoc
